@@ -1,0 +1,6 @@
+styled-system-studio/
+dist/
+node_modules/
+storybook-static/
+styled-system/
+

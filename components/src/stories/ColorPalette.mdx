@@ -1,0 +1,24 @@
+
+import { Meta, ColorPalette, ColorItem } from '@storybook/blocks';
+import { themeColors, cleanToken, swatches } from './themeColors';
+import { token } from '@styled-system/tokens';
+
+
+<Meta title="Theme/Colors" />
+
+<ColorPalette>
+    {swatches.map(({ name, swatches }) => (
+      <div key={name}>
+        <h2>{name}</h2>
+        
+          <ColorItem
+            key={name}
+            name={name}
+            title={name}
+            colors={swatches}
+          />
+        
+      </div>
+    ))}
+</ColorPalette>
+
