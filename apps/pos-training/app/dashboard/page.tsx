@@ -2,13 +2,11 @@ import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Suspense } from "react";
 import ProductsList from "./(components)/ProductsList";
 import { getCatalogItems } from "@/utils/getCatalogItems";
-import DashboardHeader from "./(components)/DashboardHeader";
 import { HStack } from "@/styled-system/jsx";
 
 export default async function Dashboard() {
   return (
     <>
-      <DashboardHeader />
       <Suspense fallback={<FallBack />}>
         <ProductsListWrapper />
       </Suspense>

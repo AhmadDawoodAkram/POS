@@ -2,27 +2,28 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@pallas-ui/components/src/ui/button";
 import { css } from "@/styled-system/css";
 import { LogIn } from "lucide-react";
-import { Heading } from "@/components/ui/typography";
-import Dashboard from "../dashboard/page";
+import { Heading } from "@pallas-ui/components/src/ui/typography";
 import { useState } from "react";
-import { Spinner } from "@/components/ui/spinner";
+import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { VStack } from "@/styled-system/jsx";
 
 export function SignInButtons({ session }: { session: any }) {
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   return (
     <>
-      <div
-        className={css({
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "6",
+      <VStack
+        align="center"
+        gap="6"
+        css={{
           textAlign: "center",
-        })}
+        }}
       >
         <Heading
           css={{
@@ -45,23 +46,27 @@ export function SignInButtons({ session }: { session: any }) {
             >
               Get started by connecting your Square account below.
             </p>
-            {isLoading ? (
-              <Spinner />
-            ) : (
-              <Button
-                onClick={() => {
-                  setIsLoading(true);
-                  signIn("square", { callbackUrl: "/" });
-                }}
-                variant="primary"
-                shape="rounded"
-                icon={<LogIn className={css({ fontSize: "2xl" })} />}
-                iconPosition="end"
-                className={css({ padding: "8", fontSize: "2xl" })}
-              >
-                Sign in with Square
-              </Button>
-            )}
+            <Button
+              onClick={() => {
+                setIsLoading(true);
+                signIn("square", { callbackUrl });
+              }}
+              variant="primary"
+              shape="rounded"
+              icon={<LogIn />}
+              iconPosition="end"
+              className={css({
+                padding: "8",
+                fontSize: "2xl",
+                display: "flex",
+                alignItems: "center",
+                gap: "2",
+              })}
+              disabled={isLoading}
+            >
+              {isLoading && <Spinner className={css({ marginRight: "2" })} />}
+              Sign in with Square
+            </Button>
           </>
         )}
         {session && (
@@ -73,7 +78,7 @@ export function SignInButtons({ session }: { session: any }) {
             <Button size="lg">Move to Dashboard</Button>
           </Link>
         )}
-      </div>
+      </VStack>
     </>
   );
 }

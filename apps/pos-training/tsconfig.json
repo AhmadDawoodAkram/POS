@@ -22,6 +22,7 @@
       "@/*": ["./*"],
       "@styled-system/*": ["./styled-system/*"],
       "~/*": ["./components/*"],
+      "~/ui/*": ["../../ui-primitives/*"],
       "@pallas-ui/components/": ["../../components/src/*"]
     }
   },

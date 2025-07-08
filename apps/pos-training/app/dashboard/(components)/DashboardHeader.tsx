@@ -1,57 +1,24 @@
-"use client";
-import { Button } from "@pallas-ui/components/src/ui/button";
-import { Heading } from "@pallas-ui/components/src/ui/typography";
-import { css } from "@/styled-system/css";
-import { signOut } from "next-auth/react";
-import React, { useState } from "react";
+import { HStack } from "@/styled-system/jsx";
+import React from "react";
 
-const DashboardHeader = () => {
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-
-  const handleLogout = async () => {
-    setIsLoggingOut(true);
-    await signOut();
-    setIsLoggingOut(false);
-  };
-
+const DashboardHeader = ({ selectedCategory, onCategoryChange }) => {
   return (
-    <div
-      className={css({
-        display: "flex",
-        justifyContent: "space-between",
-        m: 4,
-      })}
-    >
-      <div
-        className={css({
-          display: "flex",
-          alignItems: "center",
-          fontSize: "3xl",
-          fontWeight: "bold",
-          animation: "fadeInSlideUp",
-        })}
+    <HStack justify="center" m="2">
+      <select
+        value={selectedCategory}
+        onChange={(e) => onCategoryChange(e.target.value)}
+        style={{
+          width: "150px",
+          padding: "8px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+        }}
       >
-        <Heading variant="accent" level={2} color="secondary">
-          POS
-        </Heading>
-      </div>
-      <div
-        className={css({
-          display: "flex",
-          justifyContent: "space-between",
-          p: 4,
-        })}
-      >
-        <Button
-          onClick={handleLogout}
-          disabled={isLoggingOut}
-          variant="default"
-          className={css({ fontSize: "lg", bg: "white" })}
-        >
-          {isLoggingOut ? "Logging out..." : "Logout"}
-        </Button>
-      </div>
-    </div>
+        <option value="">--Categories--</option>
+        <option value="Drinks">Drinks</option>
+        <option value="Clothing">Clothing</option>
+      </select>
+    </HStack>
   );
 };
 
