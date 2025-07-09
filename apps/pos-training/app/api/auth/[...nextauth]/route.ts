@@ -11,7 +11,7 @@ const SquareProvider: SquareProviderType = {
     url: "https://connect.squareupsandbox.com/oauth2/authorize",
     params: {
       scope:
-        "MERCHANT_PROFILE_READ PAYMENTS_READ INVENTORY_READ INVENTORY_WRITE ITEMS_READ ITEMS_WRITE",
+        "MERCHANT_PROFILE_READ PAYMENTS_READ PAYMENTS_WRITE INVENTORY_READ INVENTORY_WRITE ITEMS_READ ITEMS_WRITE ORDERS_WRITE ORDERS_READ",
     },
   },
   token: {

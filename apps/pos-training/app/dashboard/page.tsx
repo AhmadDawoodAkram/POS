@@ -3,13 +3,19 @@ import { Suspense } from "react";
 import ProductsList from "./(components)/ProductsList";
 import { getCatalogItems } from "@/utils/getCatalogItems";
 import { HStack } from "@/styled-system/jsx";
+import ProductsListWrapperTanStack from "./(components)/temp";
 
 export default async function Dashboard() {
   return (
     <>
-      <Suspense fallback={<FallBack />}>
-        <ProductsListWrapper />
-      </Suspense>
+      <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
+        <div style={{ flex: 1 }}>
+          {/* <ProductsListWrapperTanStack /> */}
+          <Suspense fallback={<FallBack />}>
+            <ProductsListWrapper />
+          </Suspense>
+        </div>
+      </div>
     </>
   );
 }
@@ -17,7 +23,6 @@ export default async function Dashboard() {
 async function ProductsListWrapper() {
   const res = await getCatalogItems();
   const data = await res.json();
-
   return <ProductsList items={data} />;
 }
 

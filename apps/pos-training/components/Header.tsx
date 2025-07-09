@@ -26,7 +26,6 @@ const Header = () => {
           fontSize: "3xl",
           fontWeight: "bold",
           flex: 1,
-          // animation: "fadeInSlideUp",
         }}
       >
         <Link href={"./"} className={css({ m: "4" })}>

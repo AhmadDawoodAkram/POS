@@ -5,6 +5,7 @@ import { SessionProvider } from "next-auth/react";
 import Header from "../components/Header";
 import { VStack } from "@/styled-system/jsx";
 import { css } from "@/styled-system/css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,6 +16,8 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+const queryClient = new QueryClient();
 
 export default function RootLayout({
   children,
@@ -30,19 +33,21 @@ export default function RootLayout({
         />
       </head>
       <SessionProvider>
-        <body
-          className={`${geistSans.variable} ${geistMono.variable}`}
-          style={{
-            minHeight: "100vh",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <div className={css({ px: "4", py: "2" })}>
-            <Header />
-          </div>
-          <VStack css={{ flex: 1 }}>{children}</VStack>
-        </body>
+        <QueryClientProvider client={queryClient}>
+          <body
+            className={`${geistSans.variable} ${geistMono.variable}`}
+            style={{
+              minHeight: "100vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
+            <div className={css({ px: "4", py: "2" })}>
+              <Header />
+            </div>
+            <VStack css={{ flex: 1 }}>{children}</VStack>
+          </body>
+        </QueryClientProvider>
       </SessionProvider>
     </html>
   );
