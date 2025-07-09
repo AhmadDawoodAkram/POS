@@ -21,7 +21,7 @@ export async function getCatalogItems() {
     });
   }
 
-  console.log(session.user.accessToken);
+  // console.log(session.user.accessToken);
 
   if (
     !session.user ||
@@ -47,7 +47,6 @@ export async function getCatalogItems() {
     const allCategoryIds = new Set<string>();
 
     for (const item of items) {
-      // Only process itemData if this is an ITEM type
       if (item.type === "ITEM" && "itemData" in item && item.itemData) {
         const imageIds = item.itemData.imageIds as string[] | null | undefined;
         if (Array.isArray(imageIds) && imageIds.length > 0) {

@@ -44,7 +44,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
       }
       const data = await response.json();
       setNetTotal(
-        Number((data.data.netAmountDueMoney.amount / 1000).toFixed(2))
+        Number((data.data.netAmountDueMoney.amount / 100).toFixed(2))
       );
     };
     calculateTotal();
@@ -211,7 +211,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
             {isLoading ? <Spinner color="solid" /> : null}
             Checkout
           </Button>
-          {/* {checkoutStatus && <SuccessfulCheckout />} */}
         </>
       )}
     </aside>

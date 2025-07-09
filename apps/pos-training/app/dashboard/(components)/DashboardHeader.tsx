@@ -4,29 +4,56 @@ import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Search } from "lucide-react";
+import useDebounce from "@/app/hooks/debounce";
+import { useQuery } from "@tanstack/react-query";
 
 interface DashboardHeaderProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
-  data: { data: { categoryData: { name: string } }[] };
-  status: string;
-  searchTerm: string;
-  setSearchTerm: (value: string) => {};
+  setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
 }
+
+const getter = async () => {
+  const res = await fetch(`../api/square/get-categories?type=CATEGORY`);
+  const data = await res.json();
+  return data;
+};
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedCategory,
   onCategoryChange,
-  data,
-  status,
-  searchTerm,
-  setSearchTerm,
+  setFilteredItems,
 }) => {
-  if (status === "loading") return <Spinner />;
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
+  const [isSearching, setIsSearching] = useState(false);
+  const { data, status } = useQuery({
+    queryKey: ["CatalogCategories"],
+    queryFn: getter,
+  });
 
-  if (status === "success") {
-    return (
-      <HStack justify="center" m="2">
+  useEffect(() => {
+    const search = async () => {
+      setIsSearching(true);
+      const result = await fetch(
+        `../api/square/search-catalog?searchText=${debouncedSearchTerm}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ selectedCategory }),
+        }
+      );
+      const items = await result.json();
+      setFilteredItems(items.data);
+      setIsSearching(false);
+    };
+    search();
+  }, [debouncedSearchTerm, selectedCategory]);
+
+  return (
+    <HStack justify="center" m="2">
+      {status === "pending" && <Spinner />}
+      {status === "success" && (
         <select
           value={selectedCategory}
           onChange={(e) => onCategoryChange(e.target.value)}
@@ -39,28 +66,41 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         >
           <option value="">--Categories--</option>
           {data.data.map((cat: any, index: number) => (
-            <option key={index} value={cat.categoryData.name}>
+            <option key={index} value={cat.id}>
               {cat.categoryData.name}
             </option>
           ))}
         </select>
-        <div
-          style={{
-            position: "relative",
-            width: "50%",
-          }}
-        >
-          <input
-            className={css({
-              width: "100%",
-              padding: "6px 32px 6px 12px",
-              borderRadius: "4px",
-              border: "1px solid #ccc",
-            })}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search Items..."
+      )}
+      <div
+        style={{
+          position: "relative",
+          width: "50%",
+        }}
+      >
+        <input
+          className={css({
+            width: "100%",
+            padding: "6px 32px 6px 12px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+          })}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder="Search Items..."
+        />
+        {isSearching && (
+          <Spinner
+            style={{
+              position: "absolute",
+              right: "10px",
+              top: "6px",
+              pointerEvents: "none",
+            }}
           />
+        )}
+
+        {!isSearching && (
           <Search
             size={18}
             style={{
@@ -72,10 +112,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               pointerEvents: "none",
             }}
           />
-        </div>
-      </HStack>
-    );
-  }
+        )}
+      </div>
+    </HStack>
+  );
 };
 
 export default DashboardHeader;

@@ -4,23 +4,13 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "./Card";
 import DashboardHeader from "./DashboardHeader";
 import CartSidebar from "./CartSidebar";
-import { useQuery } from "@tanstack/react-query";
-
-const getter = async () => {
-  const res = await fetch(`../api/square/get-categories?type=CATEGORY`);
-  const data = await res.json();
-  return data;
-};
 
 const ProductsList = ({ items }: { items: any[] }) => {
+  const [filteredItems, setFilteredItems] = useState(items);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [cart, setCart] = useState<any[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const { data, status, isPending } = useQuery({
-    queryKey: ["CatalogCategories"],
-    queryFn: getter,
-  });
 
   //effect for window resizing event listener
   useEffect(() => {
@@ -30,13 +20,13 @@ const ProductsList = ({ items }: { items: any[] }) => {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const filteredItems = selectedCategory
-    ? items.filter((item) =>
-        item.categoryData?.some(
-          (cat: any) => cat.categoryData?.name === selectedCategory
-        )
-      )
-    : items;
+  // const filteredItems = selectedCategory
+  //   ? items.filter((item) =>
+  //       item.categoryData?.some(
+  //         (cat: any) => cat.categoryData?.name === selectedCategory
+  //       )
+  //     )
+  //   : items;
 
   const updateCart = (
     item: { itemData: { variations: any[] }; id: string },
@@ -76,8 +66,7 @@ const ProductsList = ({ items }: { items: any[] }) => {
           <DashboardHeader
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
-            data={data}
-            status={status}
+            setFilteredItems={setFilteredItems}
           />
           {/* Mobile cart toggle button */}
           {isMobile && (
@@ -111,9 +100,14 @@ const ProductsList = ({ items }: { items: any[] }) => {
               overflowX: "hidden",
             })}
           >
-            {filteredItems.map((item) => (
-              <ProductCard key={item.id} item={item} onAddToCart={updateCart} />
-            ))}
+            {filteredItems.length > 0 &&
+              filteredItems.map((item) => (
+                <ProductCard
+                  key={item.id}
+                  item={item}
+                  onAddToCart={updateCart}
+                />
+              ))}
           </div>
         </div>
         {/* Desktop sidebar */}
