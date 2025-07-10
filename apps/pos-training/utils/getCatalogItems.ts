@@ -21,8 +21,6 @@ export async function getCatalogItems() {
     });
   }
 
-  // console.log(session.user.accessToken);
-
   if (
     !session.user ||
     !("accessToken" in session.user) ||

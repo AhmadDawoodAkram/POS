@@ -1,9 +1,8 @@
-import Square from "@/utils/squareClient";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
+import Square from "./squareClient";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function calculateTotal(order: any) {
   const session = await getServerSession(authOptions);
   if (!session) {
     return new Response(JSON.stringify({ error: "Missing access token" }), {
@@ -13,12 +12,11 @@ export async function POST(req: NextRequest, res: NextResponse) {
   const client = Square({ session });
 
   try {
-    const { order } = await req.json();
     const response = await client.orders.calculate({
       order,
     });
 
-    console.log(response.order?.lineItems);
+    console.log(response.order);
 
     return new Response(
       JSON.stringify({ success: true, data: response.order }, (_, value) =>

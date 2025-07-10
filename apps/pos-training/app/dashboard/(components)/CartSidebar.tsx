@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Heading, Paragraph } from "@pallas-ui/components/src/ui/typography";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { HStack } from "@/styled-system/jsx";
+import { useQuery } from "@tanstack/react-query";
 
 interface CartItem {
   id: string;
@@ -13,6 +14,7 @@ interface CartItem {
     itemVariationData?: { name?: string; priceMoney?: { amount?: number } };
   };
   quantity: number;
+  imageUrls: string[];
 }
 
 interface CartSidebarProps {
@@ -21,38 +23,51 @@ interface CartSidebarProps {
   onRemove: (id: string, variantId: string) => void;
 }
 
+const fetchBillSummary = async (orderPayload: any) => {
+  const response = await fetch("/api/square/calculate-total", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(orderPayload),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "Failed to calculate total");
+  }
+
+  return await response.json();
+};
+
 const CartSidebar: React.FC<CartSidebarProps> = ({
   cart,
   resetCart,
   onRemove,
 }) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [discount, setDiscount] = useState(0);
-  const [netTotal, setNetTotal] = useState(0);
+  const {
+    data,
+    isPending: isLoading,
+    isError,
+    error,
+  } = useQuery({
+    queryKey: ["bill-summary", cart],
+    queryFn: () => fetchBillSummary(orderPayload),
+    enabled: cart.length > 0,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    const calculateTotal = async () => {
-      const response = await fetch("/api/square/calculate-total", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(orderPayload),
-      });
+  const discount = data
+    ? Number((data.data.totalDiscountMoney.amount / 100).toFixed(2))
+    : 0;
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Error Calculating Total: ", errorData);
-        return;
-      }
-      const data = await response.json();
-      setDiscount(
-        Number((data.data.totalDiscountMoney.amount / 100).toFixed(2))
-      );
-      setNetTotal(
-        Number((data.data.netAmountDueMoney.amount / 100).toFixed(2))
-      );
-    };
-    calculateTotal();
-  }, [cart]);
+  const netTotal = data
+    ? Number((data.data.netAmountDueMoney.amount / 100).toFixed(2))
+    : 0;
+
+  const discountArr = data
+    ? data.data.lineItems.map((arr: any) =>
+        Number((arr.totalDiscountMoney.amount / 100).toFixed(2))
+      )
+    : 0;
 
   const total = cart.reduce(
     (sum, item) =>
@@ -72,19 +87,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
     order: {
       locationId: "L2GYMH3VTH0FG",
       lineItems,
-      //   fulfillments: [
-      //     {
-      //       type: "PICKUP",
-      //       state: "PROPOSED",
-      //       pickupDetails: {
-      //         recipient: {
-      //           displayName: "Dawood",
-      //           phoneNumber: "+923000000000",
-      //         },
-      //         pickupAt: "2024-08-28T15:30:00Z",
-      //       },
-      //     },
-      //   ],
       taxes: [
         {
           catalogObjectId: "TWWXFIX3SDCGVN3R4DA6RV6A",
@@ -100,8 +102,6 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   };
 
   const handleCheckout = async () => {
-    setIsLoading(true);
-
     const response = await fetch("/api/square/create-order", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -113,15 +113,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
       console.error("Order creation failed:", errorData);
       return;
     }
-
-    // setCheckoutStatus(true);
     const data = await response.json();
     console.log("Order Creation Response => ", data);
-    setIsLoading(false);
     resetCart();
   };
-
-  useEffect(() => {}, []);
 
   return (
     <aside
@@ -146,75 +141,149 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
         <Paragraph>Your cart is empty.</Paragraph>
       ) : (
         <>
-          {cart.map((cartItem) => (
-            <div
-              key={`${cartItem.id}-${cartItem.variantId}`}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 8,
-              }}
-            >
-              <span>
-                {cartItem.itemData.name}
-                {cartItem.variant?.itemVariationData?.name
-                  ? ` (${cartItem.variant.itemVariationData.name})`
-                  : ""}
-              </span>
-              <span>Qty: {cartItem.quantity}</span>
-              <span>
-                {Number(
-                  cartItem.variant?.itemVariationData?.priceMoney?.amount
-                ) / 100}
-                $
-              </span>
-              <Button
-                size="sm"
+          {cart.map((cartItem, index) => {
+            return (
+              <div
+                key={`${cartItem.id}-${cartItem.variantId}`}
                 style={{
-                  marginLeft: 8,
-                  color: "#fff",
-                  background: "#e74c3c",
-                  border: "none",
-                  borderRadius: "100%",
-                  padding: "10px",
-                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 12,
+                  background: "#f9f9f9",
+                  borderRadius: 12,
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                  padding: 12,
+                  marginBottom: 12,
+                  position: "relative",
                 }}
-                onClick={() => onRemove(cartItem.id, cartItem.variantId)}
-                aria-label="Remove item"
               >
-                &times;
-              </Button>
-            </div>
-          ))}
+                <img
+                  src={cartItem.imageUrls[0] || "/placeholder.png"}
+                  alt={cartItem.itemData.name}
+                  style={{
+                    width: 56,
+                    height: 56,
+                    objectFit: "cover",
+                    borderRadius: 8,
+                    border: "1px solid #eee",
+                    background: "#fff",
+                  }}
+                />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontWeight: 600, fontSize: 16 }}>
+                    {cartItem.itemData.name}
+                    {cartItem.variant?.itemVariationData?.name
+                      ? ` (${cartItem.variant.itemVariationData.name})`
+                      : ""}
+                  </div>
+                  <Paragraph css={{ color: "#888", fontSize: "13" }}>
+                    Qty: {cartItem.quantity}x
+                  </Paragraph>
+                  <HStack align="center" gap="2">
+                    {!isLoading && (
+                      <>
+                        <Paragraph
+                          css={{
+                            color: "#888",
+                            fontWeight: 500,
+                            textDecoration: `${discountArr[index] > 0 ? "line-through" : ""}`,
+                            fontSize: 15,
+                          }}
+                        >
+                          {(
+                            (Number(
+                              cartItem.variant?.itemVariationData?.priceMoney
+                                ?.amount
+                            ) *
+                              Number(cartItem.quantity)) /
+                            100
+                          ).toFixed(2)}
+                          $
+                        </Paragraph>
+                        {discountArr[index] > 0 && (
+                          <Paragraph
+                            css={{
+                              color: "#e74c3c",
+                              fontWeight: 700,
+                              fontSize: 16,
+                              marginLeft: 6,
+                            }}
+                          >
+                            {(
+                              (Number(
+                                cartItem.variant?.itemVariationData?.priceMoney
+                                  ?.amount
+                              ) *
+                                Number(cartItem.quantity)) /
+                                100 -
+                              discountArr[index]
+                            ).toFixed(2)}
+                            $
+                          </Paragraph>
+                        )}
+                      </>
+                    )}
+                  </HStack>
+                </div>
+                <Button
+                  size="sm"
+                  css={{
+                    background: "#e74c3c",
+                    borderRadius: "50%",
+                    width: 6,
+                    height: 6,
+                    fontSize: 18,
+                    cursor: "pointer",
+                    position: "absolute",
+                    top: 8,
+                    right: 4,
+                  }}
+                  onClick={() => onRemove(cartItem.id, cartItem.variantId)}
+                  aria-label="Remove item"
+                >
+                  &times;
+                </Button>
+              </div>
+            );
+          })}
           <hr style={{ width: "100%", margin: "12px 0" }} />
 
           {/* Bill */}
-          <HStack
-            justify="space-between"
-            css={{
-              justifyContent: "space-between",
-              fontWeight: "bold",
-            }}
-          >
-            <Paragraph>Total:</Paragraph>
-            <Paragraph>{total.toFixed(2)}$</Paragraph>
-          </HStack>
-          <HStack
-            justify="space-between"
-            css={{
-              justifyContent: "space-between",
-              fontWeight: "bold",
-            }}
-          >
-            <Paragraph>Discount</Paragraph>
-            <Paragraph color="error">-{discount.toFixed(2)}$</Paragraph>
-          </HStack>
-          <HStack justify="space-between" css={{ fontWeight: "bold" }}>
-            <Paragraph>Net Total:</Paragraph>
-            <Paragraph>{netTotal.toFixed(2)}$</Paragraph>
-          </HStack>
-          <Paragraph size="subscript">10% GST applied*</Paragraph>
+          <>
+            <HStack
+              justify="space-between"
+              css={{
+                justifyContent: "space-between",
+                fontWeight: "bold",
+              }}
+            >
+              <Paragraph>Total:</Paragraph>
+              <Paragraph>{total.toFixed(2)}$</Paragraph>
+            </HStack>
+            <HStack
+              justify="space-between"
+              css={{
+                justifyContent: "space-between",
+                fontWeight: "bold",
+              }}
+            >
+              <Paragraph>Discount</Paragraph>
+              {!isLoading ? (
+                <Paragraph color="error">-{discount.toFixed(2)}$</Paragraph>
+              ) : (
+                <>...</>
+              )}
+            </HStack>
+            <HStack justify="space-between" css={{ fontWeight: "bold" }}>
+              <Paragraph>Net Total:</Paragraph>
+              {!isLoading ? (
+                <Paragraph>{netTotal.toFixed(2)}$</Paragraph>
+              ) : (
+                <>...</>
+              )}
+            </HStack>
+            <Paragraph size="subscript">10% GST applied*</Paragraph>
+          </>
           <Button
             width="full"
             style={{

@@ -38,6 +38,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   onCategoryChange,
   setFilteredItems,
 }) => {
+  const [hasSearched, setHasSearched] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const { data: categories, status: categoriesStatus } = useQuery<any>({
@@ -45,16 +46,13 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
     queryFn: getCategories,
   });
 
-  const {
-    data: filteredItemsData,
-    status: filteredItemsStatus,
-    isFetching: isSearching,
-  } = useQuery<any>({
+  const { data: filteredItemsData, isLoading: isSearching } = useQuery<any>({
     queryKey: ["FilteredItems", debouncedSearchTerm, selectedCategory],
     queryFn: fetchFilteredItems,
+    enabled: hasSearched,
   });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (filteredItemsData?.data) {
       setFilteredItems(filteredItemsData.data);
     }
@@ -97,10 +95,15 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             border: "1px solid #ccc",
           })}
           value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            if (!hasSearched) {
+              setHasSearched(true);
+            }
+          }}
           placeholder="Search Items..."
         />
-        {isSearching && (
+        {isSearching ? (
           <Spinner
             style={{
               position: "absolute",
@@ -109,8 +112,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
               pointerEvents: "none",
             }}
           />
-        )}
-        {!isSearching && (
+        ) : (
           <Search
             size={18}
             style={{
