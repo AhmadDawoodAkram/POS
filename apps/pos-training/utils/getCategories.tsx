@@ -1,9 +1,8 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import { NextRequest } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import Square from "@/utils/squareClient";
+import Square from "./squareClient";
 
-export async function GET(req: NextRequest) {
+export const getCategories = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -14,18 +13,17 @@ export async function GET(req: NextRequest) {
 
   const client = Square({ session });
 
-  const searchParams = req.nextUrl.searchParams;
-  const type = searchParams.get("type");
-  if (!type) {
-    return;
-  }
+  //   const searchParams = req.nextUrl.searchParams;
+  //   const type = searchParams.get("type");
+  //     if (!type) {
+  //       return;
+  //     }
 
   try {
     const response = await client.catalog.search({
       includeRelatedObjects: false,
-      objectTypes: [type as any],
+      objectTypes: ["CATEGORY"] as any,
     });
-    console.log(response);
 
     return new Response(
       JSON.stringify({ success: true, data: response.objects }, (_, value) =>
@@ -41,4 +39,4 @@ export async function GET(req: NextRequest) {
       { status: 500 }
     );
   }
-}
+};

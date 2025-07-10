@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import ProductsList from "./(components)/ProductsList";
 import { getCatalogItems } from "@/utils/getCatalogItems";
 import { HStack } from "@/styled-system/jsx";
+import { getCategories } from "@/utils/getCategories";
 
 export default async function Dashboard() {
   return (
@@ -21,7 +22,11 @@ export default async function Dashboard() {
 async function ProductsListWrapper() {
   const res = await getCatalogItems();
   const data = await res.json();
-  return <ProductsList items={data} />;
+
+  const categoryRes = await getCategories();
+  const categoryData = await categoryRes.json();
+
+  return <ProductsList items={data} categories={categoryData.data} />;
 }
 
 const FallBack = () => {

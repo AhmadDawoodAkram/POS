@@ -5,6 +5,7 @@ import { Heading, Paragraph } from "@pallas-ui/components/src/ui/typography";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { HStack } from "@/styled-system/jsx";
 import { useQuery } from "@tanstack/react-query";
+import { useBillCalculations } from "@/hooks/billCalculation";
 
 interface CartItem {
   id: string;
@@ -43,31 +44,14 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   resetCart,
   onRemove,
 }) => {
-  const {
-    data,
-    isPending: isLoading,
-    isError,
-    error,
-  } = useQuery({
+  const { data, isPending: isLoading } = useQuery({
     queryKey: ["bill-summary", cart],
     queryFn: () => fetchBillSummary(orderPayload),
     enabled: cart.length > 0,
     refetchOnWindowFocus: false,
   });
 
-  const discount = data
-    ? Number((data.data.totalDiscountMoney.amount / 100).toFixed(2))
-    : 0;
-
-  const netTotal = data
-    ? Number((data.data.netAmountDueMoney.amount / 100).toFixed(2))
-    : 0;
-
-  const discountArr = data
-    ? data.data.lineItems.map((arr: any) =>
-        Number((arr.totalDiscountMoney.amount / 100).toFixed(2))
-      )
-    : 0;
+  const { discount, netTotal, discountArr } = useBillCalculations(data);
 
   const total = cart.reduce(
     (sum, item) =>

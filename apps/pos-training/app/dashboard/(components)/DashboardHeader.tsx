@@ -4,20 +4,15 @@ import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Search } from "lucide-react";
-import useDebounce from "@/app/hooks/debounce";
+import useDebounce from "@/hooks/debounce";
 import { useQuery } from "@tanstack/react-query";
 
 interface DashboardHeaderProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
+  categories: [];
 }
-
-const getCategories = async () => {
-  const res = await fetch(`../api/square/get-categories?type=CATEGORY`);
-  const data = await res.json();
-  return data;
-};
 
 const fetchFilteredItems = async (context: any) => {
   const [_key, searchText, selectedCategory] = context.queryKey;
@@ -37,14 +32,11 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedCategory,
   onCategoryChange,
   setFilteredItems,
+  categories,
 }) => {
   const [hasSearched, setHasSearched] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const { data: categories, status: categoriesStatus } = useQuery<any>({
-    queryKey: ["CatalogCategories"],
-    queryFn: getCategories,
-  });
 
   const { data: filteredItemsData, isLoading: isSearching } = useQuery<any>({
     queryKey: ["FilteredItems", debouncedSearchTerm, selectedCategory],
@@ -60,27 +52,26 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 
   return (
     <HStack justify="center" m="2">
-      {categoriesStatus === "pending" && <Spinner />}
-      {categoriesStatus === "success" && (
-        <select
-          value={selectedCategory}
-          onChange={(e) => onCategoryChange(e.target.value)}
-          className={css({
-            width: "150px",
-            padding: "8px",
-            borderRadius: "4px",
-            border: "1px solid #ccc",
-          })}
-          disabled={isSearching}
-        >
-          <option value="">--Categories--</option>
-          {categories?.data?.map((cat: any, index: number) => (
-            <option key={index} value={cat.id}>
-              {cat.categoryData.name}
-            </option>
-          ))}
-        </select>
-      )}
+      <select
+        value={selectedCategory}
+        onChange={(e) => onCategoryChange(e.target.value)}
+        className={css({
+          width: "150px",
+          padding: "8px",
+          borderRadius: "4px",
+          border: "1px solid #ccc",
+        })}
+        disabled={isSearching}
+      >
+        <option value="">--Categories--</option>
+        {Array.isArray(categories)
+          ? categories.map((cat: any, index: number) => (
+              <option key={index} value={cat.id}>
+                {cat.categoryData?.name}
+              </option>
+            ))
+          : null}
+      </select>
       <div
         style={{
           position: "relative",

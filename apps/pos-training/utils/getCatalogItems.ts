@@ -2,17 +2,6 @@ import { getServerSession } from "next-auth";
 import Square from "@/utils/squareClient";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 
-// Type guards and helpers
-type CatalogObjectWithItemData = {
-  itemData?: {
-    imageIds?: string[];
-    categories?: { id: string }[];
-  };
-  imageUrls?: (string | null)[];
-  categoryData?: any[];
-  [key: string]: any;
-};
-
 export async function getCatalogItems() {
   const session = await getServerSession(authOptions);
   if (!session || session === undefined) {

@@ -6,7 +6,13 @@ import DashboardHeader from "./DashboardHeader";
 import CartSidebar from "./CartSidebar";
 import { ShoppingCart } from "lucide-react";
 
-const ProductsList = ({ items }: { items: any[] }) => {
+const ProductsList = ({
+  items,
+  categories,
+}: {
+  items: any[];
+  categories: any[];
+}) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [cart, setCart] = useState<any[]>([]);
@@ -61,12 +67,13 @@ const ProductsList = ({ items }: { items: any[] }) => {
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
             setFilteredItems={setFilteredItems}
+            categories={categories}
           />
 
           <div
             className={css({
               display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(400px, 1fr))",
+              gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))",
               gap: "6",
               px: "4",
               sm: { px: "32" },
