@@ -16,9 +16,9 @@ export async function GET(req: NextRequest) {
 
   const searchParams = req.nextUrl.searchParams;
   const type = searchParams.get("type");
-  if (!type) {
-    return;
-  }
+  //   if (!type) {
+  //     return;
+  //   }
 
   try {
     const response = await client.catalog.search({

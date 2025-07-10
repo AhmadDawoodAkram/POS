@@ -4,14 +4,16 @@ import React, { useState, useEffect } from "react";
 import ProductCard from "./Card";
 import DashboardHeader from "./DashboardHeader";
 import CartSidebar from "./CartSidebar";
+import { ShoppingCart } from "lucide-react";
 
 const ProductsList = ({ items }: { items: any[] }) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [cart, setCart] = useState<any[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const resetCart = React.useCallback(async () => setCart([]), []);
   //effect for window resizing event listener
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 970);
@@ -19,14 +21,6 @@ const ProductsList = ({ items }: { items: any[] }) => {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
-
-  // const filteredItems = selectedCategory
-  //   ? items.filter((item) =>
-  //       item.categoryData?.some(
-  //         (cat: any) => cat.categoryData?.name === selectedCategory
-  //       )
-  //     )
-  //   : items;
 
   const updateCart = (
     item: { itemData: { variations: any[] }; id: string },
@@ -68,28 +62,7 @@ const ProductsList = ({ items }: { items: any[] }) => {
             onCategoryChange={setSelectedCategory}
             setFilteredItems={setFilteredItems}
           />
-          {/* Mobile cart toggle button */}
-          {isMobile && (
-            <button
-              style={{
-                position: "fixed",
-                bottom: 24,
-                right: 24,
-                zIndex: 1001,
-                padding: 16,
-                borderRadius: "50%",
-                background: "#222",
-                color: "#fff",
-                border: "none",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-                fontSize: 24,
-              }}
-              onClick={() => setIsCartOpen(true)}
-              aria-label="Open cart"
-            >
-              🛒
-            </button>
-          )}
+
           <div
             className={css({
               display: "grid",
@@ -98,6 +71,7 @@ const ProductsList = ({ items }: { items: any[] }) => {
               px: "4",
               sm: { px: "32" },
               overflowX: "hidden",
+              marginTop: "6",
             })}
           >
             {filteredItems.length > 0 &&
@@ -110,11 +84,35 @@ const ProductsList = ({ items }: { items: any[] }) => {
               ))}
           </div>
         </div>
+        {/* Mobile cart toggle button */}
+        {isMobile && !isCartOpen && (
+          <button
+            className={css({
+              position: "fixed",
+              bottom: 8,
+              right: 12,
+              zIndex: 1001,
+              padding: 4,
+              borderRadius: "50%",
+              bg: "#222",
+              color: "#fff",
+              border: "none",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+              fontSize: 24,
+              _hover: { bg: "gray.300" },
+            })}
+            style={{}}
+            onClick={() => setIsCartOpen(true)}
+            aria-label="Open cart"
+          >
+            <ShoppingCart />
+          </button>
+        )}
         {/* Desktop sidebar */}
         {!isMobile && (
           <CartSidebar
             cart={cart}
-            resetCart={React.useCallback(async () => setCart([]), [])}
+            resetCart={resetCart}
             onRemove={handleRemoveFromCart}
           />
         )}
@@ -151,7 +149,7 @@ const ProductsList = ({ items }: { items: any[] }) => {
               &times;
             </button>
             <CartSidebar
-              resetCart={React.useCallback(async () => setCart([]), [])}
+              resetCart={resetCart}
               cart={cart}
               onRemove={handleRemoveFromCart}
             />

@@ -27,6 +27,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
   onRemove,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [discount, setDiscount] = useState(0);
   const [netTotal, setNetTotal] = useState(0);
 
   useEffect(() => {
@@ -43,6 +44,9 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
         return;
       }
       const data = await response.json();
+      setDiscount(
+        Number((data.data.totalDiscountMoney.amount / 100).toFixed(2))
+      );
       setNetTotal(
         Number((data.data.netAmountDueMoney.amount / 100).toFixed(2))
       );
@@ -88,6 +92,10 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
           scope: "ORDER",
         },
       ],
+      pricingOptions: {
+        autoApplyDiscounts: true,
+        autoApplyTaxes: false,
+      },
     },
   };
 
@@ -133,6 +141,7 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
       <Heading level={3} style={{ marginBottom: 16 }}>
         Shopping Cart
       </Heading>
+      {/* Cart List */}
       {cart.length === 0 ? (
         <Paragraph>Your cart is empty.</Paragraph>
       ) : (
@@ -179,6 +188,8 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
             </div>
           ))}
           <hr style={{ width: "100%", margin: "12px 0" }} />
+
+          {/* Bill */}
           <HStack
             justify="space-between"
             css={{
@@ -189,7 +200,16 @@ const CartSidebar: React.FC<CartSidebarProps> = ({
             <Paragraph>Total:</Paragraph>
             <Paragraph>{total.toFixed(2)}$</Paragraph>
           </HStack>
-
+          <HStack
+            justify="space-between"
+            css={{
+              justifyContent: "space-between",
+              fontWeight: "bold",
+            }}
+          >
+            <Paragraph>Discount</Paragraph>
+            <Paragraph color="error">-{discount.toFixed(2)}$</Paragraph>
+          </HStack>
           <HStack justify="space-between" css={{ fontWeight: "bold" }}>
             <Paragraph>Net Total:</Paragraph>
             <Paragraph>{netTotal.toFixed(2)}$</Paragraph>

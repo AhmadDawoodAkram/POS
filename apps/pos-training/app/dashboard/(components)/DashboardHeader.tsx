@@ -13,10 +13,24 @@ interface DashboardHeaderProps {
   setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
 }
 
-const getter = async () => {
+const getCategories = async () => {
   const res = await fetch(`../api/square/get-categories?type=CATEGORY`);
   const data = await res.json();
   return data;
+};
+
+const fetchFilteredItems = async (context: any) => {
+  const [_key, searchText, selectedCategory] = context.queryKey;
+  const res = await fetch(
+    `/api/square/search-catalog?searchText=${searchText}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ selectedCategory }),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to fetch catalog");
+  return res.json();
 };
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
@@ -26,34 +40,30 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const [isSearching, setIsSearching] = useState(false);
-  const { data, status } = useQuery({
+  const { data: categories, status: categoriesStatus } = useQuery<any>({
     queryKey: ["CatalogCategories"],
-    queryFn: getter,
+    queryFn: getCategories,
   });
 
-  useEffect(() => {
-    const search = async () => {
-      setIsSearching(true);
-      const result = await fetch(
-        `../api/square/search-catalog?searchText=${debouncedSearchTerm}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ selectedCategory }),
-        }
-      );
-      const items = await result.json();
-      setFilteredItems(items.data);
-      setIsSearching(false);
-    };
-    search();
-  }, [debouncedSearchTerm, selectedCategory]);
+  const {
+    data: filteredItemsData,
+    status: filteredItemsStatus,
+    isFetching: isSearching,
+  } = useQuery<any>({
+    queryKey: ["FilteredItems", debouncedSearchTerm, selectedCategory],
+    queryFn: fetchFilteredItems,
+  });
+
+  React.useEffect(() => {
+    if (filteredItemsData?.data) {
+      setFilteredItems(filteredItemsData.data);
+    }
+  }, [filteredItemsData, setFilteredItems]);
 
   return (
     <HStack justify="center" m="2">
-      {status === "pending" && <Spinner />}
-      {status === "success" && (
+      {categoriesStatus === "pending" && <Spinner />}
+      {categoriesStatus === "success" && (
         <select
           value={selectedCategory}
           onChange={(e) => onCategoryChange(e.target.value)}
@@ -63,9 +73,10 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             borderRadius: "4px",
             border: "1px solid #ccc",
           })}
+          disabled={isSearching}
         >
           <option value="">--Categories--</option>
-          {data.data.map((cat: any, index: number) => (
+          {categories?.data?.map((cat: any, index: number) => (
             <option key={index} value={cat.id}>
               {cat.categoryData.name}
             </option>
@@ -99,7 +110,6 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
             }}
           />
         )}
-
         {!isSearching && (
           <Search
             size={18}
