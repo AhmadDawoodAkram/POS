@@ -18,8 +18,6 @@ export async function POST(req: NextRequest, res: NextResponse) {
       order,
     });
 
-    console.log(response.order?.lineItems);
-
     return new Response(
       JSON.stringify({ success: true, data: response.order }, (_, value) =>
         typeof value === "bigint" ? value.toString() : value

@@ -1,6 +1,6 @@
 "use client";
 import { css } from "@/styled-system/css";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import ProductCard from "./Card";
 import DashboardHeader from "./DashboardHeader";
 import CartSidebar from "./CartSidebar";
@@ -9,9 +9,11 @@ import { ShoppingCart } from "lucide-react";
 const ProductsList = ({
   items,
   categories,
+  discounts,
 }: {
   items: any[];
   categories: any[];
+  discounts: any[];
 }) => {
   const [filteredItems, setFilteredItems] = useState(items);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -19,7 +21,19 @@ const ProductsList = ({
   const [isMobile, setIsMobile] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const resetCart = React.useCallback(async () => setCart([]), []);
+  const resetCart = useCallback(async () => setCart([]), []);
+  const handleUpdateQuantity = useCallback(
+    (id: string, variantId: string, quantity: number) => {
+      setCart((prevCart) =>
+        prevCart.map((item) =>
+          item.id === id && item.variantId === variantId
+            ? { ...item, quantity }
+            : item
+        )
+      );
+    },
+    []
+  );
   //effect for window resizing event listener
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 970);
@@ -50,14 +64,11 @@ const ProductsList = ({
     });
   };
 
-  const handleRemoveFromCart = React.useCallback(
-    (id: string, variantId: string) => {
-      setCart((prev) =>
-        prev.filter((item) => !(item.id === id && item.variantId === variantId))
-      );
-    },
-    []
-  );
+  const handleRemoveFromCart = useCallback((id: string, variantId: string) => {
+    setCart((prev) =>
+      prev.filter((item) => !(item.id === id && item.variantId === variantId))
+    );
+  }, []);
 
   return (
     <>
@@ -121,6 +132,8 @@ const ProductsList = ({
             cart={cart}
             resetCart={resetCart}
             onRemove={handleRemoveFromCart}
+            onUpdateQuantity={handleUpdateQuantity}
+            discounts={discounts}
           />
         )}
         {/* Mobile sidebar*/}
@@ -159,6 +172,8 @@ const ProductsList = ({
               resetCart={resetCart}
               cart={cart}
               onRemove={handleRemoveFromCart}
+              onUpdateQuantity={handleUpdateQuantity}
+              discounts={discounts}
             />
           </div>
         )}

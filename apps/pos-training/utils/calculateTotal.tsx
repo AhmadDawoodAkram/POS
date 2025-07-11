@@ -1,34 +1,23 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
-import { NextRequest } from "next/server";
-import { authOptions } from "../../auth/[...nextauth]/route";
-import Square from "@/utils/squareClient";
+import Square from "./squareClient";
 
-export async function GET(req: NextRequest) {
+export async function calculateTotal(order: any) {
   const session = await getServerSession(authOptions);
-
   if (!session) {
     return new Response(JSON.stringify({ error: "Missing access token" }), {
       status: 401,
     });
   }
-
   const client = Square({ session });
 
-  const searchParams = req.nextUrl.searchParams;
-  const type = searchParams.get("type");
-  if (!type) {
-    return;
-  }
-
   try {
-    const response = await client.catalog.search({
-      includeRelatedObjects: false,
-      objectTypes: [type as any],
+    const response = await client.orders.calculate({
+      order,
     });
-    console.log(response);
 
     return new Response(
-      JSON.stringify({ success: true, data: response.objects }, (_, value) =>
+      JSON.stringify({ success: true, data: response.order }, (_, value) =>
         typeof value === "bigint" ? value.toString() : value
       ),
       { status: 200 }

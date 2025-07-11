@@ -11,7 +11,7 @@ interface DashboardHeaderProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
   setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
-  categories: [];
+  categories: any[];
 }
 
 const fetchFilteredItems = async (context: any) => {

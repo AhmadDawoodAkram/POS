@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import ProductsList from "./(components)/ProductsList";
 import { getCatalogItems } from "@/utils/getCatalogItems";
 import { HStack } from "@/styled-system/jsx";
-import { getCategories } from "@/utils/getCategories";
+import { getCategories } from "@/utils/getCategories-Discounts";
 
 export default async function Dashboard() {
   return (
@@ -20,13 +20,26 @@ export default async function Dashboard() {
 }
 
 async function ProductsListWrapper() {
-  const res = await getCatalogItems();
-  const data = await res.json();
+  const [res, categoryRes] = await Promise.all([
+    getCatalogItems(),
+    getCategories(),
+  ]);
 
-  const categoryRes = await getCategories();
-  const categoryData = await categoryRes.json();
+  // Wait for both JSON bodies in parallel as well
+  const [data, categoryData] = await Promise.all([
+    res.json(),
+    categoryRes.json(),
+  ]);
+  const categories = categoryData.data.filter(
+    (item: any) => item.type === "CATEGORY"
+  );
+  const discounts = categoryData.data.filter(
+    (item: any) => item.type === "DISCOUNT"
+  );
 
-  return <ProductsList items={data} categories={categoryData.data} />;
+  return (
+    <ProductsList items={data} categories={categories} discounts={discounts} />
+  );
 }
 
 const FallBack = () => {

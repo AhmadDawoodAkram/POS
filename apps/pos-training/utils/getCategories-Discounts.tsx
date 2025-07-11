@@ -22,7 +22,7 @@ export const getCategories = async () => {
   try {
     const response = await client.catalog.search({
       includeRelatedObjects: false,
-      objectTypes: ["CATEGORY"] as any,
+      objectTypes: ["CATEGORY", "DISCOUNT"] as any,
     });
 
     return new Response(
