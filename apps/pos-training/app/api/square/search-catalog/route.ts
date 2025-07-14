@@ -106,6 +106,8 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    console.log(items);
+
     return new Response(
       JSON.stringify({ success: true, data: items }, (_, value) =>
         typeof value === "bigint" ? value.toString() : value

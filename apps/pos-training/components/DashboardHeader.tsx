@@ -1,55 +1,30 @@
 "use client";
-import React, { useEffect, useState } from "react";
 import { css } from "@/styled-system/css";
 import { HStack } from "@/styled-system/jsx";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Search } from "lucide-react";
-import useDebounce from "@/hooks/debounce";
-import { useQuery } from "@tanstack/react-query";
 
 interface DashboardHeaderProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
-  setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
   categories: any[];
+  isSearching: boolean;
+  searchTerm: string;
+  onSetSearchTerm: (val: string) => void;
+  hasSearched: boolean;
+  onSetHasSearched: () => void;
 }
-
-const fetchFilteredItems = async (context: any) => {
-  const [_key, searchText, selectedCategory] = context.queryKey;
-  const res = await fetch(
-    `/api/square/search-catalog?searchText=${searchText}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ selectedCategory }),
-    }
-  );
-  if (!res.ok) throw new Error("Failed to fetch catalog");
-  return res.json();
-};
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
   selectedCategory,
   onCategoryChange,
-  setFilteredItems,
   categories,
+  isSearching,
+  searchTerm,
+  onSetSearchTerm,
+  hasSearched,
+  onSetHasSearched,
 }) => {
-  const [hasSearched, setHasSearched] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
-
-  const { data: filteredItemsData, isLoading: isSearching } = useQuery<any>({
-    queryKey: ["FilteredItems", debouncedSearchTerm, selectedCategory],
-    queryFn: fetchFilteredItems,
-    enabled: hasSearched,
-  });
-
-  useEffect(() => {
-    if (filteredItemsData?.data) {
-      setFilteredItems(filteredItemsData.data);
-    }
-  }, [filteredItemsData, setFilteredItems]);
-
   return (
     <HStack justify="center" m="2">
       <select
@@ -87,9 +62,9 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           })}
           value={searchTerm}
           onChange={(e) => {
-            setSearchTerm(e.target.value);
+            onSetSearchTerm(e.target.value);
             if (!hasSearched) {
-              setHasSearched(true);
+              onSetHasSearched();
             }
           }}
           placeholder="Search Items..."

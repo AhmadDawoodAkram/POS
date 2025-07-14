@@ -1,10 +1,11 @@
 "use client";
 import { css } from "@/styled-system/css";
 import React, { useState, useEffect, useCallback } from "react";
-import ProductCard from "./Card";
-import DashboardHeader from "./DashboardHeader";
-import CartSidebar from "./CartSidebar";
 import { ShoppingCart } from "lucide-react";
+import { Box, Flex } from "@/styled-system/jsx";
+import DashboardHeaderContainer from "@/containers/DashboardHeader.container";
+import CartContainer from "@/containers/Cart.container";
+import ProductCard from "@/components/Card";
 
 const ProductsList = ({
   items,
@@ -72,9 +73,9 @@ const ProductsList = ({
 
   return (
     <>
-      <div style={{ display: "flex", alignItems: "flex-start", width: "100%" }}>
-        <div style={{ flex: 1 }}>
-          <DashboardHeader
+      <Flex w="100%" align="flex-start">
+        <Box css={{ flex: 1 }}>
+          <DashboardHeaderContainer
             selectedCategory={selectedCategory}
             onCategoryChange={setSelectedCategory}
             setFilteredItems={setFilteredItems}
@@ -101,7 +102,7 @@ const ProductsList = ({
                 />
               ))}
           </div>
-        </div>
+        </Box>
         {/* Mobile cart toggle button */}
         {isMobile && !isCartOpen && (
           <button
@@ -128,7 +129,7 @@ const ProductsList = ({
         )}
         {/* Desktop sidebar */}
         {!isMobile && (
-          <CartSidebar
+          <CartContainer
             cart={cart}
             resetCart={resetCart}
             onRemove={handleRemoveFromCart}
@@ -168,7 +169,7 @@ const ProductsList = ({
             >
               &times;
             </button>
-            <CartSidebar
+            <CartContainer
               resetCart={resetCart}
               cart={cart}
               onRemove={handleRemoveFromCart}
@@ -177,7 +178,7 @@ const ProductsList = ({
             />
           </div>
         )}
-      </div>
+      </Flex>
     </>
   );
 };

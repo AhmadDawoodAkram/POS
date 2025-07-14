@@ -16,18 +16,8 @@ export async function calculateTotal(order: any) {
       order,
     });
 
-    return new Response(
-      JSON.stringify({ success: true, data: response.order }, (_, value) =>
-        typeof value === "bigint" ? value.toString() : value
-      ),
-      { status: 200 }
-    );
+    return response.order;
   } catch (error) {
-    return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : String(error),
-      }),
-      { status: 500 }
-    );
+    return error;
   }
 }

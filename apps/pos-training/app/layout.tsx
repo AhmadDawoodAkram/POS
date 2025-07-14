@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { SessionProvider } from "next-auth/react";
 import Header from "../components/Header";
-import { VStack } from "@/styled-system/jsx";
-import { css } from "@/styled-system/css";
+import { Box, VStack } from "@/styled-system/jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const geistSans = Geist({
@@ -42,9 +41,9 @@ export default function RootLayout({
               flexDirection: "column",
             }}
           >
-            <div className={css({ px: "4", py: "2" })}>
+            <Box css={{ px: "4", py: "2" }}>
               <Header />
-            </div>
+            </Box>
             <VStack css={{ flex: 1 }}>{children}</VStack>
           </body>
         </QueryClientProvider>

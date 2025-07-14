@@ -43,7 +43,7 @@ const Header = () => {
               onClick={handleLogout}
               disabled={isLoggingOut}
               variant="text"
-              css={{ fontSize: "lg" }}
+              css={{ fontSize: "lg", cursor: "pointer" }}
             >
               Logout
             </Button>

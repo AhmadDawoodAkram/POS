@@ -1,4 +1,3 @@
-// apps/pos-training/app/SignInButtons.tsx
 "use client";
 
 import { signIn } from "next-auth/react";

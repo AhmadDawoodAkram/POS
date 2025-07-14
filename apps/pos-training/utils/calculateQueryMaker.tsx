@@ -1,9 +1,10 @@
-import { CartItem } from "@/app/dashboard/(components)/CartSidebar";
+import { CartItem } from "@/app/dashboard/(components)/Cart";
 
 export function buildOrderPayload(
   cart: CartItem[],
   selectedDiscounts: { [key: string]: string },
-  discounts: any[]
+  discounts: any[],
+  autoDiscount: string
 ): any {
   // 1. Get all selected discount IDs
   const selectedDiscountIds = Object.values(selectedDiscounts).filter(Boolean);
@@ -41,7 +42,22 @@ export function buildOrderPayload(
     },
   ];
 
-  // 5. Build and return the payload
+  if (autoDiscount === "auto") {
+    return {
+      idempotencyKey: crypto.randomUUID(),
+      order: {
+        locationId: "L2GYMH3VTH0FG",
+        lineItems,
+        discounts: orderDiscounts,
+        taxes,
+        pricingOptions: {
+          autoApplyDiscounts: true,
+          autoApplyTaxes: false,
+        },
+      },
+    };
+  }
+
   return {
     idempotencyKey: crypto.randomUUID(),
     order: {
