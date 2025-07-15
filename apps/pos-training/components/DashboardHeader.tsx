@@ -51,15 +51,16 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
         style={{
           position: "relative",
           width: "50%",
+          margin: "4",
         }}
       >
         <input
-          className={css({
+          style={{
             width: "100%",
             padding: "6px 32px 6px 12px",
             borderRadius: "4px",
             border: "1px solid #ccc",
-          })}
+          }}
           value={searchTerm}
           onChange={(e) => {
             onSetSearchTerm(e.target.value);

@@ -1,10 +1,10 @@
 import { useState } from "react";
 import CartContainerProps from "@/interfaces/CartContainer.interface";
-import CartItem from "@/interfaces/CartItem.interface";
 import { useQuery } from "@tanstack/react-query";
 import { useBillCalculations } from "@/hooks/billCalculation";
 import { buildOrderPayload } from "@/utils/calculateQueryMaker";
 import Cart from "@/components/Cart";
+import Product from "@/interfaces/Product.interface";
 
 const fetchBillSummary = async (orderPayload: any) => {
   const response = await fetch("/api/square/calculate-total", {
@@ -23,7 +23,7 @@ const fetchBillSummary = async (orderPayload: any) => {
 
 const isDiscountApplicableToItem = (
   discount: any,
-  cartItem: CartItem
+  cartItem: Product
 ): boolean => {
   const match = discount.discountData?.name?.match(/Category:([^)]+)/);
   if (match && match[1]) {

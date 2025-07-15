@@ -6,7 +6,7 @@ import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { HStack, VStack } from "@/styled-system/jsx";
 import { css } from "@/styled-system/css";
 import ModeSelector from "@/components/ModeSelector";
-import CartItem from "@/interfaces/CartItem.interface";
+import Product from "@/interfaces/Product.interface";
 import type Cart from "@/interfaces/Cart.interface";
 
 const Cart: React.FC<Cart> = ({
@@ -49,7 +49,7 @@ const Cart: React.FC<Cart> = ({
         <Paragraph>Your cart is empty.</Paragraph>
       ) : (
         <>
-          {cart.map((cartItem: CartItem, index: number) => {
+          {cart.map((cartItem: Product, index: number) => {
             const cartKey = `${cartItem.id}-${cartItem.variantId}`;
             return (
               <VStack

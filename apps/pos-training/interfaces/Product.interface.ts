@@ -1,4 +1,4 @@
-export default interface CartItem {
+export default interface Product {
   categoryData: any;
   id: string;
   variantId: string;

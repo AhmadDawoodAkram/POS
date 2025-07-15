@@ -1,7 +1,7 @@
-import { CartItem } from "@/app/dashboard/(components)/Cart";
+import Product from "@/interfaces/Product.interface";
 
 export function buildOrderPayload(
-  cart: CartItem[],
+  cart: Product[],
   selectedDiscounts: { [key: string]: string },
   discounts: any[],
   autoDiscount: string
@@ -13,7 +13,7 @@ export function buildOrderPayload(
   );
 
   // 2. Build line items with applied discounts
-  const lineItems = cart.map((item: CartItem) => {
+  const lineItems = cart.map((item: Product) => {
     const cartKey = `${item.id}-${item.variantId}`;
     const selectedDiscountId = selectedDiscounts[cartKey];
     const lineItem: any = {

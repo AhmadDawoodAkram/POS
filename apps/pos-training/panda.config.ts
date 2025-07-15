@@ -32,8 +32,9 @@ export default defineConfig({
 
   // Where to look for your css declarations
   include: [
-    "./pos-training/**/*.{js,jsx,ts,tsx}",
     "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,ts,jsx,tsx}",
+    "./containers/**/*.{js,ts,jsx,tsx}",
   ],
 
   // Files to exclude

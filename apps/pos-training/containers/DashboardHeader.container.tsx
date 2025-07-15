@@ -1,12 +1,13 @@
 import DashboardHeader from "@/components/DashboardHeader";
 import useDebounce from "@/hooks/debounce";
+import { useProductsStore } from "@/store/productsStore";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface DashboardHeaderContainerProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
-  setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
+  // setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
   categories: any[];
 }
 
@@ -27,9 +28,10 @@ const fetchFilteredItems = async (context: any) => {
 const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
   selectedCategory,
   onCategoryChange,
-  setFilteredItems,
+  // setFilteredItems,
   categories,
 }) => {
+  const { setProducts } = useProductsStore();
   const [hasSearched, setHasSearched] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -42,9 +44,15 @@ const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
 
   useEffect(() => {
     if (filteredItemsData?.data) {
-      setFilteredItems(filteredItemsData.data);
+      setProducts(filteredItemsData.data);
     }
-  }, [filteredItemsData, setFilteredItems]);
+  }, [filteredItemsData, setProducts]);
+
+  // useEffect(() => {
+  //   if (filteredItemsData?.data) {
+  //     setFilteredItems(filteredItemsData.data);
+  //   }
+  // }, [filteredItemsData, setFilteredItems]);
 
   return (
     <DashboardHeader

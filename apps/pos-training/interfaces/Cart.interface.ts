@@ -1,7 +1,7 @@
-import CartItem from "./CartItem.interface";
+import Product from "./Product.interface";
 
 export default interface Cart {
-  cart: CartItem[];
+  cart: Product[];
   onUpdateQuantity: (id: string, variantId: string, quantity: number) => void;
   isLoading: boolean;
   discountArr: any[];
@@ -11,7 +11,7 @@ export default interface Cart {
   autoDiscount: string;
   setAutoDiscount: (dic: string) => void;
   discounts: any[];
-  isDiscountApplicableToItem: (discount: any, cartItem: CartItem) => boolean;
+  isDiscountApplicableToItem: (discount: any, cartItem: Product) => boolean;
   total: number;
   netTotal: number;
   discount: number;
