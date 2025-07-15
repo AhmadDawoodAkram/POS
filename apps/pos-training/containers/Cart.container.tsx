@@ -43,25 +43,48 @@ const CartContainer: React.FC<CartContainerProps> = ({
   onRemove,
   onUpdateQuantity,
   discounts,
+  taxes,
 }) => {
   const [selectedDiscounts, setSelectedDiscounts] = useState<{
     [key: string]: string;
   }>({});
-  const [autoDiscount, setAutoDiscount] = useState<string>("auto");
+  const [selectedTax, setSelectedTax] = useState<{
+    [key: string]: string;
+  }>({});
+  const [orderTax, setOrderTax] = useState<string>("");
+  const [orderDiscount, setOrderDiscount] = useState<string>("");
+  const [billMode, setBillMode] = useState<string>("order");
 
   const orderPayload = buildOrderPayload(
     cart,
     selectedDiscounts,
     discounts,
-    autoDiscount
+    billMode,
+    selectedTax,
+    taxes,
+    orderTax,
+    orderDiscount
   );
 
+  console.log("CONTAINER RECEIVING ORDER PAYLOAD ", orderPayload);
+
   const { data, isPending: isLoading } = useQuery({
-    queryKey: ["bill-summary", cart, selectedDiscounts, autoDiscount],
+    queryKey: [
+      "bill-summary",
+      cart,
+      selectedDiscounts,
+      billMode,
+      selectedTax,
+      orderTax,
+      orderDiscount,
+    ],
     queryFn: () => fetchBillSummary(orderPayload),
     enabled: cart.length > 0,
     refetchOnWindowFocus: false,
   });
+
+  // console.log(data);
+
   const { discount, netTotal, discountArr } = useBillCalculations(data);
 
   const total = cart.reduce(
@@ -96,6 +119,12 @@ const CartContainer: React.FC<CartContainerProps> = ({
     }));
   };
 
+  const handleTaxChange = (cartKey: string, taxId: string) => {
+    setSelectedTax((prev) => ({
+      ...prev,
+      [cartKey]: taxId,
+    }));
+  };
   return (
     <Cart
       cart={cart}
@@ -105,14 +134,28 @@ const CartContainer: React.FC<CartContainerProps> = ({
       onRemove={onRemove}
       selectedDiscounts={selectedDiscounts}
       handleDiscountChange={handleDiscountChange}
-      autoDiscount={autoDiscount}
-      setAutoDiscount={setAutoDiscount}
+      // --- DISCOUNT PROPS ---
+      billMode={billMode}
+      setBillMode={(val) => {
+        setBillMode(val);
+        setSelectedDiscounts({});
+        setSelectedTax({});
+        setOrderTax("");
+        setOrderDiscount("");
+      }}
       discounts={discounts}
       isDiscountApplicableToItem={isDiscountApplicableToItem}
+      // --- TAX PROPS ---
+      selectedTax={selectedTax}
+      handleTaxChange={handleTaxChange}
+      taxes={taxes}
       total={total}
       netTotal={netTotal}
       discount={discount}
       handleCheckout={handleCheckout}
+      // --- Order Level Tax/Dis
+      setOrderTax={(val) => setOrderTax(val)}
+      setOrderDiscount={(val) => setOrderDiscount(val)}
     />
   );
 };

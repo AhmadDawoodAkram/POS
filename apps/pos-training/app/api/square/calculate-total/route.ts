@@ -14,6 +14,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
 
   try {
     const { order } = await req.json();
+    console.log(order);
+
     const response = await client.orders.calculate({
       order,
     });

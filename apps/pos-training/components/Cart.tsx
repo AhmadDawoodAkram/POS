@@ -3,11 +3,12 @@ import React from "react";
 import { Button } from "@pallas-ui/components/src/ui/button";
 import { Heading, Paragraph } from "@pallas-ui/components/src/ui/typography";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
-import { HStack, VStack } from "@/styled-system/jsx";
+import { Box, HStack, VStack } from "@/styled-system/jsx";
 import { css } from "@/styled-system/css";
 import ModeSelector from "@/components/ModeSelector";
 import Product from "@/interfaces/Product.interface";
 import type Cart from "@/interfaces/Cart.interface";
+import Dropdown from "./Dropdown";
 
 const Cart: React.FC<Cart> = ({
   cart,
@@ -17,17 +18,22 @@ const Cart: React.FC<Cart> = ({
   onRemove,
   selectedDiscounts,
   handleDiscountChange,
-  autoDiscount,
-  setAutoDiscount,
+  billMode,
+  setBillMode,
   discounts,
   isDiscountApplicableToItem,
+  selectedTax,
+  handleTaxChange,
+  taxes,
   total,
   netTotal,
   discount,
   handleCheckout,
+  setOrderTax,
+  setOrderDiscount,
 }) => {
   return (
-    <aside
+    <Box
       style={{
         minWidth: 300,
         maxWidth: 350,
@@ -190,28 +196,35 @@ const Cart: React.FC<Cart> = ({
                     &times;
                   </Button>
                 </HStack>
-                <Paragraph size="compact">
-                  <select
-                    className={css({ padding: "2" })}
-                    value={selectedDiscounts[cartKey] || ""}
-                    onChange={(e) =>
-                      handleDiscountChange(cartKey, e.target.value)
-                    }
-                    disabled={autoDiscount === "auto"}
-                  >
-                    <option value="">No Discount</option>
-                    {discounts
-                      .filter((discount) =>
-                        isDiscountApplicableToItem(discount, cartItem)
-                      )
-                      .map((discount) => (
-                        <option key={discount.id} value={discount.id}>
-                          {discount.discountData?.name || "Unnamed Discount"} (
-                          {discount.discountData?.percentage}%)
-                        </option>
-                      ))}
-                  </select>
-                </Paragraph>
+                {/* Tax and Discount Dropdown */}
+                {billMode === "line" && (
+                  <HStack>
+                    {/* Discount Selector */}
+                    <Paragraph size="compact" css={{ w: "100px" }}>
+                      <Dropdown
+                        name="Discount"
+                        options={discounts.filter((discount) =>
+                          isDiscountApplicableToItem(discount, cartItem)
+                        )}
+                        onChange={(e) => handleDiscountChange(cartKey, e)}
+                        getLabel={(option) =>
+                          `${option.discountData?.name || "Unnamed Discount"} (${option.discountData?.percentage}%)`
+                        }
+                      />
+                    </Paragraph>
+                    {/* Tax Selector */}
+                    <Paragraph size="compact" css={{ w: "100px" }}>
+                      <Dropdown
+                        name="Tax"
+                        options={taxes}
+                        onChange={(e) => handleTaxChange(cartKey, e)}
+                        getLabel={(option) =>
+                          `${option.taxData?.name || "Unnamed Tax"} (${option.taxData?.percentage}%)`
+                        }
+                      />
+                    </Paragraph>
+                  </HStack>
+                )}
               </VStack>
             );
           })}
@@ -250,22 +263,40 @@ const Cart: React.FC<Cart> = ({
               <>...</>
             )}
           </HStack>
-          <Paragraph size="subscript">10% GST applied*</Paragraph>
-
-          <ModeSelector
-            autoDiscount={autoDiscount}
-            setAutoDiscount={setAutoDiscount}
-          />
-
+          {/* <Paragraph size="subscript">10% GST applied*</Paragraph> */}
+          <VStack>
+            <ModeSelector billMode={billMode} setBillMode={setBillMode} />
+            {billMode === "order" && (
+              <>
+                <Dropdown
+                  name="Discount"
+                  options={discounts}
+                  onChange={(itemId) => setOrderDiscount(itemId)}
+                  getLabel={(option) =>
+                    `${option.discountData?.name || "Unnamed Discount"} (${option.discountData?.percentage}%)`
+                  }
+                />
+                <Dropdown
+                  name="Tax"
+                  options={taxes}
+                  onChange={(itemId) => setOrderTax(itemId)}
+                  getLabel={(option) =>
+                    `${option.taxData?.name || "Unnamed Tax"} (${option.taxData?.percentage}%)`
+                  }
+                />
+              </>
+            )}
+          </VStack>
           <Button
             width="full"
-            style={{
+            css={{
               color: "black",
-              marginTop: 16,
-              padding: 8,
+              marginTop: 8,
+              padding: 4,
               background: "#eee",
               border: "none",
-              borderRadius: 4,
+              borderRadius: 6,
+              _hover: { background: "#ccc" },
             }}
             onClick={handleCheckout}
             disabled={isLoading}
@@ -275,7 +306,7 @@ const Cart: React.FC<Cart> = ({
           </Button>
         </>
       )}
-    </aside>
+    </Box>
   );
 };
 

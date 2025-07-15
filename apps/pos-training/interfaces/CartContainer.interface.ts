@@ -6,4 +6,5 @@ export default interface CartContainerProps {
   onRemove: (id: string, variantId: string) => void;
   onUpdateQuantity: (id: string, variantId: string, quantity: number) => void;
   discounts: any[];
+  taxes: any[];
 }

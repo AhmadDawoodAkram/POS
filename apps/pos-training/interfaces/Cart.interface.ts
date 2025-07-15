@@ -8,12 +8,17 @@ export default interface Cart {
   onRemove: (id: string, variantId: string) => void;
   selectedDiscounts: { [key: string]: string };
   handleDiscountChange: (cartKey: string, discountId: string) => void;
-  autoDiscount: string;
-  setAutoDiscount: (dic: string) => void;
+  billMode: string;
+  setBillMode: (dic: string) => void;
   discounts: any[];
   isDiscountApplicableToItem: (discount: any, cartItem: Product) => boolean;
+  selectedTax: { [key: string]: string };
+  handleTaxChange: (cartKey: string, taxId: string) => void;
+  taxes: any[];
   total: number;
   netTotal: number;
   discount: number;
   handleCheckout: () => void;
+  setOrderTax: (val: string) => void;
+  setOrderDiscount: (val: string) => void;
 }

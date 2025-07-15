@@ -1,26 +1,32 @@
 import ProductsList from "@/components/ProductsList";
 import { getCatalogItems } from "@/utils/getCatalogItems";
-import { getCategories } from "@/utils/getCategories-Discounts";
+import { getSquareCatalogMeta } from "@/utils/getCategories-Discounts";
 
 const ProductsListContainer = async () => {
-  const [res, categoryRes] = await Promise.all([
+  const [res, metaRes] = await Promise.all([
     getCatalogItems(),
-    getCategories(),
+    getSquareCatalogMeta(), // for Categories + Discounts + Taxes
   ]);
 
-  const [data, categoryData] = await Promise.all([
-    res.json(),
-    categoryRes.json(),
-  ]);
-  const categories = categoryData.data.filter(
+  const [data, metaData] = await Promise.all([res.json(), metaRes.json()]);
+
+  const categories = metaData.data.filter(
     (item: any) => item.type === "CATEGORY"
   );
-  const discounts = categoryData.data.filter(
+  const discounts = metaData.data.filter(
     (item: any) => item.type === "DISCOUNT"
   );
+  console.log(metaData.data);
+
+  const taxes = metaData.data.filter((item: any) => item.type === "TAX");
 
   return (
-    <ProductsList items={data} categories={categories} discounts={discounts} />
+    <ProductsList
+      items={data}
+      categories={categories}
+      discounts={discounts}
+      taxes={taxes}
+    />
   );
 };
 

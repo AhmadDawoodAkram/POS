@@ -2,7 +2,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { getServerSession } from "next-auth";
 import Square from "./squareClient";
 
-export const getCategories = async () => {
+export const getSquareCatalogMeta = async () => {
   const session = await getServerSession(authOptions);
 
   if (!session) {
@@ -13,16 +13,10 @@ export const getCategories = async () => {
 
   const client = Square({ session });
 
-  //   const searchParams = req.nextUrl.searchParams;
-  //   const type = searchParams.get("type");
-  //     if (!type) {
-  //       return;
-  //     }
-
   try {
     const response = await client.catalog.search({
       includeRelatedObjects: false,
-      objectTypes: ["CATEGORY", "DISCOUNT"] as any,
+      objectTypes: ["CATEGORY", "DISCOUNT", "TAX"],
     });
 
     return new Response(

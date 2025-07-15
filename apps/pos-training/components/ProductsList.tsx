@@ -11,10 +11,12 @@ const ProductsList = ({
   items,
   categories,
   discounts,
+  taxes,
 }: {
   items: any[];
   categories: any[];
   discounts: any[];
+  taxes: any[];
 }) => {
   const { products, setProducts } = useProductsStore();
   const displayItems = products.length > 0 ? products : items;
@@ -140,6 +142,7 @@ const ProductsList = ({
           onRemove={handleRemoveFromCart}
           onUpdateQuantity={handleUpdateQuantity}
           discounts={discounts}
+          taxes={taxes}
         />
       )}
       {/* Mobile sidebar*/}
@@ -180,6 +183,7 @@ const ProductsList = ({
             onRemove={handleRemoveFromCart}
             onUpdateQuantity={handleUpdateQuantity}
             discounts={discounts}
+            taxes={taxes}
           />
         </div>
       )}

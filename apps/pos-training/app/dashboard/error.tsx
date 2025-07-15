@@ -1,17 +1,24 @@
 "use client";
 
-interface ErrorProps {
-  error: Error;
-  reset: () => void;
-}
+import ErrorProps from "@/interfaces/ErrorProps.interface";
+import { VStack } from "@/styled-system/jsx";
+import { Heading, Paragraph } from "@pallas-ui/components/src/ui/typography";
+import { Button } from "@pallas-ui/components/src/ui/button";
 
 const Error = ({ error, reset }: ErrorProps) => {
   return (
-    <div style={{ padding: 32 }}>
-      <h2>Something went wrong!</h2>
-      <p>{error.message}</p>
-      <button onClick={() => reset()}>Try again</button>
-    </div>
+    <VStack
+      css={{
+        alignItems: "center",
+        justifyContent: "center",
+        height: "70vh",
+        width: "100%",
+      }}
+    >
+      <Heading>Something went wrong!</Heading>
+      <Paragraph>{error.message}</Paragraph>
+      <Button onClick={() => reset()}>Try again</Button>
+    </VStack>
   );
 };
 

@@ -7,6 +7,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { HStack } from "@/styled-system/jsx";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
+import Image from "next/image";
 
 const Header = () => {
   const { data: session, status } = useSession();
@@ -29,8 +30,16 @@ const Header = () => {
         }}
       >
         <Link href={"./"} className={css({ m: "4" })}>
-          <Heading variant="accent" level={2} color="secondary">
-            POS
+          <Heading variant="accent" level={2}>
+            <HStack gap="1">
+              <Image
+                src="/square.png"
+                alt="Square logo"
+                width={34}
+                height={34}
+              />
+              SquarePOS
+            </HStack>
           </Heading>
         </Link>
       </HStack>
