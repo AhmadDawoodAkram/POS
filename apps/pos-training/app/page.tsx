@@ -5,8 +5,6 @@ import { HStack } from "@/styled-system/jsx";
 
 export default async function Home() {
   const session = await getServerSession(authOptions);
-
-  // console.log(session);
   return (
     <HStack
       justify="center"

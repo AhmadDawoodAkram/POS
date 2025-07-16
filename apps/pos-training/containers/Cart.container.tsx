@@ -66,8 +66,6 @@ const CartContainer: React.FC<CartContainerProps> = ({
     orderDiscount
   );
 
-  console.log("CONTAINER RECEIVING ORDER PAYLOAD ", orderPayload);
-
   const { data, isPending: isLoading } = useQuery({
     queryKey: [
       "bill-summary",
@@ -82,8 +80,6 @@ const CartContainer: React.FC<CartContainerProps> = ({
     enabled: cart.length > 0,
     refetchOnWindowFocus: false,
   });
-
-  // console.log(data);
 
   const { discount, netTotal, discountArr } = useBillCalculations(data);
 
@@ -125,6 +121,16 @@ const CartContainer: React.FC<CartContainerProps> = ({
       [cartKey]: taxId,
     }));
   };
+
+  const orderLevelDiscounts = discounts.filter((discount: any) =>
+    cart.every((item: Product) => isDiscountApplicableToItem(discount, item))
+  );
+
+  const orderLevelTaxes = taxes.filter((tax: any) =>
+    cart.every((item: Product) => {
+      return true;
+    })
+  );
   return (
     <Cart
       cart={cart}
@@ -132,23 +138,23 @@ const CartContainer: React.FC<CartContainerProps> = ({
       isLoading={isLoading}
       discountArr={discountArr}
       onRemove={onRemove}
-      selectedDiscounts={selectedDiscounts}
       handleDiscountChange={handleDiscountChange}
       // --- DISCOUNT PROPS ---
       billMode={billMode}
       setBillMode={(val) => {
-        setBillMode(val);
-        setSelectedDiscounts({});
-        setSelectedTax({});
-        setOrderTax("");
-        setOrderDiscount("");
+        if (billMode !== val) {
+          setBillMode(val);
+          setSelectedDiscounts({});
+          setSelectedTax({});
+          setOrderTax("");
+          setOrderDiscount("");
+        }
       }}
-      discounts={discounts}
+      discounts={orderLevelDiscounts}
       isDiscountApplicableToItem={isDiscountApplicableToItem}
       // --- TAX PROPS ---
-      selectedTax={selectedTax}
       handleTaxChange={handleTaxChange}
-      taxes={taxes}
+      taxes={orderLevelTaxes}
       total={total}
       netTotal={netTotal}
       discount={discount}

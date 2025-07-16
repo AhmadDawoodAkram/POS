@@ -5,14 +5,20 @@ const Dropdown = ({
   options,
   onChange,
   getLabel,
+  isLoading,
 }: {
   name: string;
   options: any[];
   onChange: (value: string) => void;
   getLabel: (option: any) => string;
+  isLoading?: boolean;
 }) => {
   return (
-    <Select.Root onValueChange={onChange}>
+    <Select.Root
+      onValueChange={onChange}
+      size="lg"
+      disabled={isLoading || false}
+    >
       <Select.Trigger
         css={{
           width: "100%",

@@ -16,7 +16,6 @@ const ProductsListContainer = async () => {
   const discounts = metaData.data.filter(
     (item: any) => item.type === "DISCOUNT"
   );
-  console.log(metaData.data);
 
   const taxes = metaData.data.filter((item: any) => item.type === "TAX");
 

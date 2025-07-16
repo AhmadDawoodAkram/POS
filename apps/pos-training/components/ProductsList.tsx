@@ -88,7 +88,6 @@ const ProductsList = ({
         <DashboardHeaderContainer
           selectedCategory={selectedCategory}
           onCategoryChange={setSelectedCategory}
-          // setFilteredItems={setFilteredItems}
           categories={categories}
         />
 

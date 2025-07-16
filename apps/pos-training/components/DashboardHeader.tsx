@@ -1,8 +1,9 @@
 "use client";
 import { css } from "@/styled-system/css";
-import { HStack } from "@/styled-system/jsx";
+import { Box, HStack } from "@/styled-system/jsx";
 import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Search } from "lucide-react";
+import Dropdown from "./Dropdown";
 
 interface DashboardHeaderProps {
   selectedCategory: string;
@@ -27,40 +28,32 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
 }) => {
   return (
     <HStack justify="center" m="2">
-      <select
-        value={selectedCategory}
-        onChange={(e) => onCategoryChange(e.target.value)}
-        className={css({
+      <Box
+        css={{
           width: "150px",
-          padding: "8px",
-          borderRadius: "4px",
-          border: "1px solid #ccc",
-        })}
-        disabled={isSearching}
+        }}
       >
-        <option value="">--Categories--</option>
-        {Array.isArray(categories)
-          ? categories.map((cat: any, index: number) => (
-              <option key={index} value={cat.id}>
-                {cat.categoryData?.name}
-              </option>
-            ))
-          : null}
-      </select>
+        <Dropdown
+          name="Categories"
+          options={categories}
+          onChange={(cat) => onCategoryChange(cat)}
+          getLabel={(cat) => cat.categoryData.name}
+          isLoading={isSearching}
+        />
+      </Box>
       <div
         style={{
           position: "relative",
           width: "50%",
-          margin: "4",
         }}
       >
         <input
-          style={{
+          className={css({
             width: "100%",
-            padding: "6px 32px 6px 12px",
-            borderRadius: "4px",
+            padding: "8px 32px 6px 12px",
+            borderRadius: "6px",
             border: "1px solid #ccc",
-          }}
+          })}
           value={searchTerm}
           onChange={(e) => {
             onSetSearchTerm(e.target.value);

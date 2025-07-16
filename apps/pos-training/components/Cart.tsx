@@ -16,13 +16,11 @@ const Cart: React.FC<Cart> = ({
   isLoading,
   discountArr,
   onRemove,
-  selectedDiscounts,
   handleDiscountChange,
   billMode,
   setBillMode,
   discounts,
   isDiscountApplicableToItem,
-  selectedTax,
   handleTaxChange,
   taxes,
   total,
@@ -126,53 +124,45 @@ const Cart: React.FC<Cart> = ({
                       </button>
                     </Paragraph>
                     <HStack align="center" gap="2">
-                      {!isLoading ? (
-                        <>
-                          <Paragraph
-                            css={{
-                              color: "#888",
-                              fontWeight: 500,
-                              textDecoration:
-                                discountArr[index] > 0
-                                  ? "line-through"
-                                  : "none",
-                              fontSize: 15,
-                            }}
-                          >
-                            {(
-                              (Number(
-                                cartItem.variant?.itemVariationData?.priceMoney
-                                  ?.amount
-                              ) *
-                                Number(cartItem.quantity)) /
-                              100
-                            ).toFixed(2)}
-                            $
-                          </Paragraph>
-                          {discountArr[index] > 0 && (
-                            <Paragraph
-                              css={{
-                                color: "#e74c3c",
-                                fontWeight: 700,
-                                fontSize: 16,
-                                marginLeft: 2,
-                              }}
-                            >
-                              {(
-                                (Number(
-                                  cartItem.variant?.itemVariationData
-                                    ?.priceMoney?.amount
-                                ) *
-                                  Number(cartItem.quantity)) /
-                                  100 -
-                                discountArr[index]
-                              ).toFixed(2)}
-                              $
-                            </Paragraph>
-                          )}
-                        </>
-                      ) : (
-                        <>...</>
+                      <Paragraph
+                        css={{
+                          color: "#888",
+                          fontWeight: 500,
+                          textDecoration:
+                            discountArr[index] > 0 ? "line-through" : "none",
+                          fontSize: 15,
+                        }}
+                      >
+                        {(
+                          (Number(
+                            cartItem.variant?.itemVariationData?.priceMoney
+                              ?.amount
+                          ) *
+                            Number(cartItem.quantity)) /
+                          100
+                        ).toFixed(2)}
+                        $
+                      </Paragraph>
+                      {!isLoading && discountArr[index] > 0 && (
+                        <Paragraph
+                          css={{
+                            color: "#e74c3c",
+                            fontWeight: 700,
+                            fontSize: 16,
+                            marginLeft: 2,
+                          }}
+                        >
+                          {(
+                            (Number(
+                              cartItem.variant?.itemVariationData?.priceMoney
+                                ?.amount
+                            ) *
+                              Number(cartItem.quantity)) /
+                              100 -
+                            discountArr[index]
+                          ).toFixed(2)}
+                          $
+                        </Paragraph>
                       )}
                     </HStack>
                   </div>

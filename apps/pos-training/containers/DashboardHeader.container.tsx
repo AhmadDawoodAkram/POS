@@ -7,7 +7,6 @@ import { useEffect, useState } from "react";
 interface DashboardHeaderContainerProps {
   selectedCategory: string;
   onCategoryChange: (category: string) => void;
-  // setFilteredItems: React.Dispatch<React.SetStateAction<any[]>>;
   categories: any[];
 }
 
@@ -28,7 +27,6 @@ const fetchFilteredItems = async (context: any) => {
 const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
   selectedCategory,
   onCategoryChange,
-  // setFilteredItems,
   categories,
 }) => {
   const { setProducts } = useProductsStore();
@@ -47,12 +45,6 @@ const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
       setProducts(filteredItemsData.data);
     }
   }, [filteredItemsData, setProducts]);
-
-  // useEffect(() => {
-  //   if (filteredItemsData?.data) {
-  //     setFilteredItems(filteredItemsData.data);
-  //   }
-  // }, [filteredItemsData, setFilteredItems]);
 
   return (
     <DashboardHeader
