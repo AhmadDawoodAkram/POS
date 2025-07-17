@@ -1,9 +1,7 @@
 import { useState } from "react";
-import CartContainerProps from "@/interfaces/CartContainer.interface";
 import { useQuery } from "@tanstack/react-query";
-import { useBillCalculations } from "@/hooks/billCalculation";
+import { useBillCalculations } from "./useBillCalculation";
 import { buildOrderPayload } from "@/utils/calculateQueryMaker";
-import Cart from "@/components/Cart";
 import Product from "@/interfaces/Product.interface";
 
 const fetchBillSummary = async (orderPayload: any) => {
@@ -37,14 +35,20 @@ const isDiscountApplicableToItem = (
   return true;
 };
 
-const CartContainer: React.FC<CartContainerProps> = ({
+interface UseCartLogicProps {
+  cart: Product[];
+  discounts: any[];
+  taxes: any[];
+  resetCart: () => void;
+}
+
+export const useCartLogic = ({
   cart,
-  resetCart,
-  onRemove,
-  onUpdateQuantity,
   discounts,
   taxes,
-}) => {
+  resetCart,
+}: UseCartLogicProps) => {
+  // State management
   const [selectedDiscounts, setSelectedDiscounts] = useState<{
     [key: string]: string;
   }>({});
@@ -55,6 +59,7 @@ const CartContainer: React.FC<CartContainerProps> = ({
   const [orderDiscount, setOrderDiscount] = useState<string>("");
   const [billMode, setBillMode] = useState<string>("order");
 
+  // Build order payload
   const orderPayload = buildOrderPayload(
     cart,
     selectedDiscounts,
@@ -66,6 +71,7 @@ const CartContainer: React.FC<CartContainerProps> = ({
     orderDiscount
   );
 
+  // Fetch bill summary
   const { data, isPending: isLoading } = useQuery({
     queryKey: [
       "bill-summary",
@@ -81,6 +87,7 @@ const CartContainer: React.FC<CartContainerProps> = ({
     refetchOnWindowFocus: false,
   });
 
+  // Calculate totals and discounts
   const { discount, netTotal, discountArr } = useBillCalculations(data);
 
   const total = cart.reduce(
@@ -91,6 +98,7 @@ const CartContainer: React.FC<CartContainerProps> = ({
     0
   );
 
+  // Event handlers
   const handleCheckout = async () => {
     const response = await fetch("/api/square/create-order", {
       method: "POST",
@@ -122,6 +130,17 @@ const CartContainer: React.FC<CartContainerProps> = ({
     }));
   };
 
+  const handleBillModeChange = (val: string) => {
+    if (billMode !== val) {
+      setBillMode(val);
+      setSelectedDiscounts({});
+      setSelectedTax({});
+      setOrderTax("");
+      setOrderDiscount("");
+    }
+  };
+
+  // Filter discounts and taxes for order level
   const orderLevelDiscounts = discounts.filter((discount: any) =>
     cart.every((item: Product) => isDiscountApplicableToItem(discount, item))
   );
@@ -131,39 +150,35 @@ const CartContainer: React.FC<CartContainerProps> = ({
       return true;
     })
   );
-  return (
-    <Cart
-      cart={cart}
-      onUpdateQuantity={onUpdateQuantity}
-      isLoading={isLoading}
-      discountArr={discountArr}
-      onRemove={onRemove}
-      handleDiscountChange={handleDiscountChange}
-      // --- DISCOUNT PROPS ---
-      billMode={billMode}
-      setBillMode={(val) => {
-        if (billMode !== val) {
-          setBillMode(val);
-          setSelectedDiscounts({});
-          setSelectedTax({});
-          setOrderTax("");
-          setOrderDiscount("");
-        }
-      }}
-      discounts={orderLevelDiscounts}
-      isDiscountApplicableToItem={isDiscountApplicableToItem}
-      // --- TAX PROPS ---
-      handleTaxChange={handleTaxChange}
-      taxes={orderLevelTaxes}
-      total={total}
-      netTotal={netTotal}
-      discount={discount}
-      handleCheckout={handleCheckout}
-      // --- Order Level Tax/Dis
-      setOrderTax={(val) => setOrderTax(val)}
-      setOrderDiscount={(val) => setOrderDiscount(val)}
-    />
-  );
-};
 
-export default CartContainer;
+  return {
+    // State
+    selectedDiscounts,
+    selectedTax,
+    orderTax,
+    orderDiscount,
+    billMode,
+
+    // Computed values
+    total,
+    netTotal,
+    discount,
+    discountArr,
+    isLoading,
+
+    // Filtered data
+    orderLevelDiscounts,
+    orderLevelTaxes,
+
+    // Event handlers
+    handleCheckout,
+    handleDiscountChange,
+    handleTaxChange,
+    handleBillModeChange,
+    setOrderTax,
+    setOrderDiscount,
+
+    // Utility functions
+    isDiscountApplicableToItem,
+  };
+};

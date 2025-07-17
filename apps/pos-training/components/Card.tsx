@@ -5,6 +5,7 @@ import { Paragraph } from "@pallas-ui/components/src/ui/typography";
 import { Button } from "@pallas-ui/components/src/ui/button";
 import Segmented from "@pallas-ui/components/src/ui/segmented";
 import { HStack, VStack } from "@/styled-system/jsx";
+import Image from "next/image";
 
 interface ProductItem {
   id: string;
@@ -46,25 +47,30 @@ const ProductCard = React.memo(function ProductCard({
       <VStack
         w="100%"
         minH="300px"
+        position="relative"
         css={{
           border: "1px solid",
           borderColor: { base: "border", _dark: "gray.700" },
           borderRadius: "lg",
           transition: "all 0.2s ease",
+          overflow: "hidden",
           _hover: {
             boxShadow:
               "0 10px 25px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-            // transform: "scale(1.05)",
           },
         }}
-        style={{
-          backgroundImage: `url(${item.imageUrls[0]})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
-          overflow: "hidden",
-        }}
-      ></VStack>
+      >
+        <Image
+          src={item.imageUrls[0]}
+          alt={item.itemData.name}
+          sizes="400"
+          // width={400}
+          // height={300}
+          fill
+          style={{ objectFit: "cover" }}
+          priority
+        />
+      </VStack>
 
       <VStack w="100%" h="100%" justify="flex-end" align="flex-seart" pb="4">
         <Heading level={3}>{item.itemData.name}</Heading>

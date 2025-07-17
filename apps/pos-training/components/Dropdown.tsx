@@ -5,23 +5,25 @@ const Dropdown = ({
   options,
   onChange,
   getLabel,
+  size,
   isLoading,
 }: {
   name: string;
   options: any[];
   onChange: (value: string) => void;
   getLabel: (option: any) => string;
+  size?: "sm" | "md" | "lg";
   isLoading?: boolean;
 }) => {
   return (
     <Select.Root
       onValueChange={onChange}
-      size="lg"
       disabled={isLoading || false}
+      size={size}
     >
       <Select.Trigger
         css={{
-          width: "100%",
+          // width: "100%",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",

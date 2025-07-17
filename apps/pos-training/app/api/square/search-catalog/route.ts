@@ -24,10 +24,6 @@ export async function POST(req: NextRequest) {
       ...(selectedCategory ? { categoryIds: [selectedCategory] } : {}),
     });
 
-    console.log(selectedCategory);
-
-    // console.log(response.items);
-
     const allCategoryIds = new Set<string>();
     const items = response.items || [];
 

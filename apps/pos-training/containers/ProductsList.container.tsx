@@ -10,23 +10,13 @@ const ProductsListContainer = async () => {
 
   const [data, metaData] = await Promise.all([res.json(), metaRes.json()]);
 
-  const categories = metaData.data.filter(
-    (item: any) => item.type === "CATEGORY"
-  );
   const discounts = metaData.data.filter(
     (item: any) => item.type === "DISCOUNT"
   );
 
   const taxes = metaData.data.filter((item: any) => item.type === "TAX");
 
-  return (
-    <ProductsList
-      items={data}
-      categories={categories}
-      discounts={discounts}
-      taxes={taxes}
-    />
-  );
+  return <ProductsList items={data} discounts={discounts} taxes={taxes} />;
 };
 
 export default ProductsListContainer;

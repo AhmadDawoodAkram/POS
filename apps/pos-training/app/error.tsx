@@ -16,7 +16,7 @@ const Error = ({ error, reset }: ErrorProps) => {
       }}
     >
       <Heading>Something went wrong!</Heading>
-      <Paragraph css={{ px: "4" }}>{error.message}</Paragraph>
+      <Paragraph>{error.message}</Paragraph>
       <Button onClick={() => reset()}>Try again</Button>
     </VStack>
   );

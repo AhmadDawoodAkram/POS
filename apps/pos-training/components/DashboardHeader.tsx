@@ -1,33 +1,37 @@
 "use client";
-import { css } from "@/styled-system/css";
 import { Box, HStack } from "@/styled-system/jsx";
-import { Spinner } from "@pallas-ui/components/src/ui/spinner";
 import { Search } from "lucide-react";
 import Dropdown from "./Dropdown";
+import { Input } from "@pallas-ui/components/src/ui/input";
+import { useCartStore } from "@/store/cartStore";
 
 interface DashboardHeaderProps {
-  selectedCategory: string;
   onCategoryChange: (category: string) => void;
   categories: any[];
   isSearching: boolean;
-  searchTerm: string;
   onSetSearchTerm: (val: string) => void;
   hasSearched: boolean;
   onSetHasSearched: () => void;
 }
 
 const DashboardHeader: React.FC<DashboardHeaderProps> = ({
-  selectedCategory,
   onCategoryChange,
   categories,
   isSearching,
-  searchTerm,
   onSetSearchTerm,
   hasSearched,
   onSetHasSearched,
 }) => {
+  const { isCartOpen } = useCartStore();
   return (
-    <HStack justify="center" m="2">
+    <HStack
+      justify="center"
+      m="2"
+      css={{
+        marginRight: isCartOpen ? "350px" : "0",
+        transition: "margin 0.3s ease-in-out",
+      }}
+    >
       <Box
         css={{
           width: "150px",
@@ -38,6 +42,7 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           options={categories}
           onChange={(cat) => onCategoryChange(cat)}
           getLabel={(cat) => cat.categoryData.name}
+          size="lg"
           isLoading={isSearching}
         />
       </Box>
@@ -47,44 +52,20 @@ const DashboardHeader: React.FC<DashboardHeaderProps> = ({
           width: "50%",
         }}
       >
-        <input
-          className={css({
-            width: "100%",
-            padding: "8px 32px 6px 12px",
-            borderRadius: "6px",
-            border: "1px solid #ccc",
-          })}
-          value={searchTerm}
-          onChange={(e) => {
-            onSetSearchTerm(e.target.value);
-            if (!hasSearched) {
-              onSetHasSearched();
-            }
-          }}
-          placeholder="Search Items..."
-        />
-        {isSearching ? (
-          <Spinner
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "6px",
-              pointerEvents: "none",
+        <Input size="lg">
+          <Input.Text
+            placeholder="Search"
+            onChange={(e) => {
+              onSetSearchTerm(e.target.value);
+              if (!hasSearched) {
+                onSetHasSearched();
+              }
             }}
           />
-        ) : (
-          <Search
-            size={18}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              color: "#888",
-              pointerEvents: "none",
-            }}
-          />
-        )}
+          <Input.Postfix>
+            <Search size={16} />
+          </Input.Postfix>
+        </Input>
       </div>
     </HStack>
   );

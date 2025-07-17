@@ -31,7 +31,7 @@ export function SignInButtons({ session }: { session: any }) {
             animation: "fadeInSlideUp",
           }}
         >
-          Welcome to the app {session ? session.user.name : "👋"}
+          Welcome to the app {session ? session.user.name : null}
         </Heading>
         {!session && (
           <>

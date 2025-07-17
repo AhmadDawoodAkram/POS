@@ -1,12 +1,11 @@
+"use client";
 import DashboardHeader from "@/components/DashboardHeader";
-import useDebounce from "@/hooks/debounce";
+import useDebounce from "@/containers/DashboardHeaderContainer/useDebounce";
 import { useProductsStore } from "@/store/productsStore";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 
 interface DashboardHeaderContainerProps {
-  selectedCategory: string;
-  onCategoryChange: (category: string) => void;
   categories: any[];
 }
 
@@ -25,13 +24,13 @@ const fetchFilteredItems = async (context: any) => {
 };
 
 const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
-  selectedCategory,
-  onCategoryChange,
   categories,
 }) => {
   const { setProducts } = useProductsStore();
   const [hasSearched, setHasSearched] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
+
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
 
   const { data: filteredItemsData, isLoading: isSearching } = useQuery<any>({
@@ -48,11 +47,9 @@ const DashboardHeaderContainer: React.FC<DashboardHeaderContainerProps> = ({
 
   return (
     <DashboardHeader
-      selectedCategory={selectedCategory}
-      onCategoryChange={onCategoryChange}
+      onCategoryChange={setSelectedCategory}
       categories={categories}
       isSearching={isSearching}
-      searchTerm={searchTerm}
       onSetSearchTerm={(val: string) => setSearchTerm(val)}
       hasSearched={hasSearched}
       onSetHasSearched={() => setHasSearched(true)}
